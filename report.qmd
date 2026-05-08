@@ -24,7 +24,7 @@ The show follows a former CIA agent, **John Reese** (played by Jim Caviezel), wh
 
 ---
 
-## Show Logo / Poster
+## Show Poster
 
 ![Person of Interest Poster](images.jpg){width=35% fig-align="center"}
 
