@@ -26,9 +26,7 @@ The show follows a former CIA agent, **John Reese** (played by Jim Caviezel), wh
 
 ## Show Logo / Poster
 
-![Person of Interest official CBS poster](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRsYtaDMlmgu-5TxYy0sFFVxhwoHu62XuhQDFr9SEz9tlMNZTZI){width=35% fig-align="center"}
-
-*Source: Wikipedia / CBS promotional material*
+![Person of Interest Poster](images.jpg){width=35% fig-align="center"}
 
 ---
 
@@ -218,4 +216,4 @@ Overall, the show lost roughly **54% of its average audience** between its peak 
 
 All viewership data sourced from [Wikipedia — List of Person of Interest episodes](https://en.wikipedia.org/wiki/List_of_Person_of_Interest_episodes), originally measured by Nielsen Media Research.
 
-> ⚠️ *Note: Sections of this report, specifically parts of the introduction paragraph and the data visualisation code, were assisted by an AI tool (Claude by Anthropic) in accordance with the course AI use policy.*
+> ⚠️ *Note: Sections of this report, specifically parts of the introduction paragraph and the data visualisation code, were assisted by an AI tool (Claude) in accordance with the assignmet AI use policy.*
