@@ -1,0 +1,221 @@
+---
+title: "Person of Interest — Viewership Analysis"
+author: "Zahra Eshtiaghi 476679"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 2
+    theme: flatly
+    self-contained: true
+    code-fold: true
+execute:
+  echo: true
+  warning: false
+---
+
+## About the Show
+
+*Person of Interest* is an American science fiction crime drama television series created by Jonathan Nolan and produced in association with *Bad Robot Productions* and *Warner Bros. Television*. The series premiered on CBS on September 22, 2011, and ran for five seasons, concluding on June 21, 2016, with a total of 103 episodes.
+
+The show follows a former CIA agent, **John Reese** (played by Jim Caviezel), who teams up with a reclusive billionaire named **Harold Finch** (Michael Emerson). Together they work in secret using a powerful artificial intelligence surveillance system called *"The Machine"* — which predicts violent crimes before they happen by generating Social Security numbers of individuals who will be involved. Over time the show expanded its cast and mythology, eventually exploring themes of mass surveillance, artificial intelligence, and the ethics of technology.
+
+*Person of Interest* was considered one of the more under-appreciated genre shows of the 2010s, appreciated particularly for the complexity of its storytelling in later seasons.
+
+---
+
+## Show Logo / Poster
+
+![Person of Interest official CBS poster](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRsYtaDMlmgu-5TxYy0sFFVxhwoHu62XuhQDFr9SEz9tlMNZTZI){width=35% fig-align="center"}
+
+*Source: Wikipedia / CBS promotional material*
+
+---
+
+## Basic Statistics
+
+```{python}
+import pandas as pd
+
+season_data = {
+    'Season': [1, 2, 3, 4, 5],
+    'Episodes': [23, 22, 23, 22, 13],
+    'Premiere Year': [2011, 2012, 2013, 2014, 2016],
+    'Avg Viewers (M)': [13.31, 14.41, 11.83, 9.42, 6.14],
+    'Peak Episode Viewers (M)': [15.67, 16.23, 13.17, 10.58, 7.35],
+    'Lowest Episode Viewers (M)': [11.57, 12.96, 10.50, 8.18, 4.92]
+}
+
+df_seasons = pd.DataFrame(season_data)
+df_seasons.index = df_seasons['Season']
+df_seasons = df_seasons.drop(columns='Season')
+
+df_seasons.style \
+    .set_caption("Table 1: Season-level viewership summary for Person of Interest") \
+    .format({'Avg Viewers (M)': '{:.2f}', 
+             'Peak Episode Viewers (M)': '{:.2f}',
+             'Lowest Episode Viewers (M)': '{:.2f}'}) \
+    .background_gradient(subset=['Avg Viewers (M)'], cmap='Blues') \
+    .set_table_styles([
+        {'selector': 'caption', 'props': [('font-size', '13px'), ('font-weight', 'bold')]}
+    ])
+```
+
+**Key facts:**
+
+- The show ran from **2011 to 2016** across 5 seasons
+- Total of **103 episodes** aired on CBS
+- Peak average season viewership: **14.41 million** (Season 2)
+- Final season average: **6.14 million** — a drop of roughly **57% from the peak**
+- The all-time highest single episode: *"2πR"* (S2E11) with **16.23 million viewers**
+
+---
+
+## Viewership Over Time (Episode by Episode)
+
+```{python}
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+import numpy as np
+
+# All episode viewership data from Wikipedia
+seasons_episodes = {
+    1: [13.33,12.51,11.57,12.04,12.42,11.62,11.76,11.65,12.66,12.93,
+        14.86,14.40,15.10,15.14,13.16,14.56,15.67,14.59,13.69,12.73,13.27,12.96,13.47],
+    2: [14.28,14.58,13.93,14.03,13.66,14.87,14.57,14.43,14.18,14.08,
+        16.23,15.67,15.71,14.88,14.87,14.22,14.57,14.34,14.57,13.22,12.96,13.16],
+    3: [12.44,12.35,11.65,12.69,13.17,12.00,11.79,12.60,12.28,11.89,
+        12.40,12.10,12.54,12.35,11.00,10.64,10.94,12.23,11.45,10.74,11.31,10.50,10.95],
+    4: [10.58,10.72,9.64,9.72,9.40,9.72,9.11,9.87,9.04,8.94,
+        10.08,10.16,9.28,9.53,9.17,9.63,8.67,9.15,8.67,9.21,8.45,8.18],
+    5: [7.35,5.80,7.34,5.31,6.97,5.49,5.33,4.92,5.49,6.66,6.36,6.27,6.51]
+}
+
+colors = ['#2196F3','#4CAF50','#FF9800','#9C27B0','#F44336']
+season_labels = ['Season 1','Season 2','Season 3','Season 4','Season 5']
+
+fig, ax = plt.subplots(figsize=(13, 5.5))
+
+ep_counter = 1
+season_boundaries = []
+
+for i, (season, viewers) in enumerate(seasons_episodes.items()):
+    x = list(range(ep_counter, ep_counter + len(viewers)))
+    ax.plot(x, viewers, color=colors[i], linewidth=1.8, alpha=0.9)
+    ax.fill_between(x, viewers, alpha=0.10, color=colors[i])
+    season_boundaries.append(ep_counter)
+    ep_counter += len(viewers)
+
+for boundary in season_boundaries[1:]:
+    ax.axvline(x=boundary - 0.5, color='grey', linestyle='--', linewidth=0.8, alpha=0.5)
+
+# Annotate season labels
+starts = [1, 24, 46, 69, 91]
+midpoints = [(starts[i] + starts[i+1]) / 2 for i in range(len(starts)-1)]
+midpoints.append((starts[-1] + 103) / 2)
+
+for i, mid in enumerate(midpoints):
+    ax.text(mid, 4.0, f'S{i+1}', ha='center', fontsize=9, color=colors[i], fontweight='bold')
+
+ax.set_xlabel('Episode Number (overall)', fontsize=11)
+ax.set_ylabel('U.S. Viewers (millions)', fontsize=11)
+ax.set_title('Person of Interest — Episode-by-Episode U.S. Viewership (2011–2016)',
+             fontsize=13, fontweight='bold', pad=12)
+ax.set_xlim(0, 104)
+ax.set_ylim(3.5, 17.5)
+ax.grid(axis='y', linestyle='--', alpha=0.4)
+
+patches = [mpatches.Patch(color=colors[i], label=season_labels[i]) for i in range(5)]
+ax.legend(handles=patches, loc='upper right', framealpha=0.85, fontsize=9)
+
+plt.tight_layout()
+plt.savefig('poi_viewership_episodes.png', dpi=150, bbox_inches='tight')
+plt.show()
+```
+
+---
+
+## Average Viewership per Season
+
+```{python}
+avg_viewers = [13.31, 14.41, 11.83, 9.42, 6.14]
+seasons = [1, 2, 3, 4, 5]
+
+fig, ax = plt.subplots(figsize=(8, 5))
+
+bars = ax.bar(seasons, avg_viewers, color=colors, edgecolor='white', linewidth=1.2, width=0.6)
+
+for bar, val in zip(bars, avg_viewers):
+    ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.15,
+            f'{val:.2f}M', ha='center', va='bottom', fontsize=10, fontweight='bold')
+
+ax.set_xlabel('Season', fontsize=11)
+ax.set_ylabel('Average Viewers (millions)', fontsize=11)
+ax.set_title('Average U.S. Viewership per Season — Person of Interest',
+             fontsize=13, fontweight='bold', pad=12)
+ax.set_xticks(seasons)
+ax.set_xticklabels([f'Season {s}' for s in seasons])
+ax.set_ylim(0, 17)
+ax.grid(axis='y', linestyle='--', alpha=0.4)
+
+plt.tight_layout()
+plt.savefig('poi_viewership_avg.png', dpi=150, bbox_inches='tight')
+plt.show()
+```
+
+---
+
+## Season-to-Season Change in Viewership
+
+```{python}
+changes = [round(avg_viewers[i] - avg_viewers[i-1], 2) for i in range(1, len(avg_viewers))]
+change_labels = ['S1 → S2', 'S2 → S3', 'S3 → S4', 'S4 → S5']
+bar_colors = ['#4CAF50' if c > 0 else '#F44336' for c in changes]
+
+fig, ax = plt.subplots(figsize=(8, 5))
+
+bars = ax.bar(change_labels, changes, color=bar_colors, edgecolor='white', linewidth=1.2, width=0.5)
+
+for bar, val in zip(bars, changes):
+    ypos = val + 0.05 if val > 0 else val - 0.12
+    ax.text(bar.get_x() + bar.get_width()/2, ypos,
+            f'{val:+.2f}M', ha='center', va='bottom', fontsize=10, fontweight='bold')
+
+ax.axhline(0, color='black', linewidth=1)
+ax.set_xlabel('Season Transition', fontsize=11)
+ax.set_ylabel('Change in Avg Viewers (millions)', fontsize=11)
+ax.set_title('Season-to-Season Change in Average Viewership — Person of Interest',
+             fontsize=13, fontweight='bold', pad=12)
+ax.set_ylim(-9, 4)
+ax.grid(axis='y', linestyle='--', alpha=0.4)
+
+green_patch = mpatches.Patch(color='#4CAF50', label='Increase')
+red_patch = mpatches.Patch(color='#F44336', label='Decrease')
+ax.legend(handles=[green_patch, red_patch], fontsize=9)
+
+plt.tight_layout()
+plt.savefig('poi_viewership_change.png', dpi=150, bbox_inches='tight')
+plt.show()
+```
+
+---
+
+## Analysis of Viewership Trends
+
+*Person of Interest* had a fairly clear arc across its five seasons: a strong start, a peak in the second season, and a steady decline through to its finale.
+
+Season 1 averaged **13.31 million viewers**, which was already solid for a new CBS drama. The show picked up momentum heading into Season 2, which became its best-performing season at an average of **14.41 million** — an increase of `+1.10 million` from the debut season. The midseason episode *"2πR"* (S2E11) represents the all-time peak of the series at **16.23 million viewers**.
+
+Season 3 marked the beginning of a notable decline, dropping to **11.83 million** on average — a fall of `-2.58 million` compared to Season 2. This is partly attributable to a timeslot shift and increased competition on Tuesday nights. The decline continued sharply in Season 4, which averaged only **9.42 million**, a drop of `-2.41 million`. The final episodes of Season 4 were consistently below 9 million, with the Season 4 finale sitting at just **8.18 million**.
+
+Season 5 was the most dramatic in terms of viewership loss. With only 13 episodes and a summer burn-off schedule starting in May 2016, average viewership collapsed to **6.14 million** — a drop of `-3.28 million` from Season 4. The lowest point of the entire run came in Season 5, Episode 8 (*"Reassortment"*) with just **4.92 million viewers**, compared to the Season 2 peak of 16.23 million — a total decline of **`-11.31 million`** between the show's best and worst individual episodes.
+
+Overall, the show lost roughly **54% of its average audience** between its peak (Season 2) and its final season (Season 5).
+
+---
+
+## Data Source
+
+All viewership data sourced from [Wikipedia — List of Person of Interest episodes](https://en.wikipedia.org/wiki/List_of_Person_of_Interest_episodes), originally measured by Nielsen Media Research.
+
+> ⚠️ *Note: Sections of this report, specifically parts of the introduction paragraph and the data visualisation code, were assisted by an AI tool (Claude by Anthropic) in accordance with the course AI use policy.*
